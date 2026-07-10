@@ -1,0 +1,16 @@
+# Netlify configuration for MOD OS
+# The Next.js app lives in the `frontend/` subdirectory, so we point Netlify's
+# base directory there. All other relative paths below resolve within `base`.
+[build]
+  base = "frontend"
+  command = "npm run build"
+  publish = ".next"
+
+# Official Netlify Next.js runtime — handles SSR, routing, image optimization.
+# Netlify auto-installs this plugin; no package.json change required.
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
+
+[build.environment]
+  # Match local development (Node 22) so builds behave identically.
+  NODE_VERSION = "22"
