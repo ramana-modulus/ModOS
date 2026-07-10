@@ -1,0 +1,33 @@
+import type { SetIntegration } from "@/features/settings/types";
+
+export const SET_INTEGRATIONS: SetIntegration[] = [
+  {id:'INT-ZOHO',     name:'Zoho Books',         icon:'ti-book', category:'Accounting',
+   status:'connected', lastSync:'23 May 2026 · 02:30', syncFreq:'Hourly',
+   scope:'POs, vendor master, invoices (out + in)', authType:'OAuth 2.0', authUser:'Priya (Accounts)',
+   note:'Bidirectional sync. POs created in MOD OS appear in Zoho Books within 5 min.'},
+  {id:'INT-TALLY',    name:'Tally Prime',        icon:'ti-calculator', category:'Accounting',
+   status:'connected', lastSync:'22 May 2026 · 23:45', syncFreq:'Nightly',
+   scope:'Final ledger entries, GST returns, balance sheet', authType:'Tally Connector', authUser:'Priya (Accounts)',
+   note:'One-way push from MOD OS → Tally. Reconciliation report runs daily.'},
+  {id:'INT-GMAIL',    name:'Gmail / Google Workspace', icon:'ti-mail', category:'Communication',
+   status:'connected', lastSync:'real-time', syncFreq:'Webhook',
+   scope:'Outbound: vendor PO emails, client RA bills, approval notifications', authType:'Google OAuth', authUser:'Org-wide',
+   note:'Notifications sent from notify@modulushousing.com.'},
+  {id:'INT-WA',       name:'WhatsApp Business API', icon:'ti-brand-whatsapp', category:'Communication',
+   status:'connected', lastSync:'23 May 2026 · 07:30', syncFreq:'Real-time',
+   scope:'Site team DPR submission, IMIR photo upload, indent raise', authType:'Meta Business', authUser:'Site numbers',
+   note:'Used by site workers without app login. Templates pre-approved.'},
+  {id:'INT-DRIVE',    name:'Google Drive',       icon:'ti-cloud', category:'Storage',
+   status:'connected', lastSync:'real-time', syncFreq:'On-event',
+   scope:'Drawings, photos, certificates, signed PDFs', authType:'Service Account', authUser:'Org-wide',
+   note:'All Project Docs auto-mirrored. Folder per project.'},
+  {id:'INT-DIGI',     name:'DigiLocker (KYC)',   icon:'ti-id-badge', category:'Compliance',
+   status:'disconnected', lastSync:null, syncFreq:'On-demand',
+   scope:'Vendor PAN/GST/MSME cert verification', authType:'API key',
+   note:'Pending CTO approval. Will replace manual KYC verification step.'},
+  {id:'INT-RZP',      name:'Razorpay X (Payouts)', icon:'ti-credit-card', category:'Banking',
+   status:'pilot', lastSync:'15 May 2026 · 10:00', syncFreq:'On-demand',
+   scope:'Vendor payouts via API, bank statement fetch', authType:'API Key + 2FA',
+   note:'Pilot phase — used only for small vendor payouts &lt; ₹50K. Scale-up post Jun 2026.'},
+];
+;
