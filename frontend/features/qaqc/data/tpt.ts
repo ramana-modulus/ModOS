@@ -1,0 +1,30 @@
+import type { Tpt } from "@/features/qaqc/types";
+
+export const QC_TPT: Record<string, Tpt[]> = {
+  'P1.SP1': [
+    {id:'TPT-003', testType:'Steel — Tensile + Chemical Analysis', bomCode:'SS-M-101',
+     lab:'SGS India Pvt Ltd', sampleSize:'3 specimens',
+     scheduledFor:'14 May 2026', sampleCollected:'14 May 2026', sentToLab:'14 May 2026',
+     status:'passed', result:'pass', reportFile:'SGS_Steel_TPT_001.pdf', reportDate:'20 May 2026', linkedGRN:'GRN-26-005', batch:'AAH-26-04-510',
+     resultNote:'YS 285 MPa (req ≥250) · UTS 425 MPa (req ≥410) · C 0.21% (req ≤0.25%). All parameters within IS 2062 E250 spec.',
+     attestedBy:'Karthik (QA Engg.)'},
+    {id:'TPT-002', testType:'Welder Qualification Test (WPS verification)', bomCode:'SS-1001',
+     lab:'IIW India',
+     scheduledFor:'02 May 2026', sampleCollected:'02 May 2026', sentToLab:'02 May 2026',
+     status:'passed', result:'pass', reportFile:'IIW_WPS_Cert_001.pdf', reportDate:'08 May 2026',
+     resultNote:'Ramesh & 2 other welders qualified per ASME Section IX for E7018 SMAW process.',
+     attestedBy:'Karthik (QA Engg.)'},
+    {id:'TPT-004', testType:'PUF Panel — Density + Compressive Strength', bomCode:'WC-M-101',
+     lab:'STADD Engineering Labs',
+     scheduledFor:'05 Jun 2026', sampleCollected:null,
+     status:'scheduled', result:null, reportFile:null,
+     resultNote:'Test to be conducted post first panel batch delivery.', attestedBy:null},
+    {id:'TPT-005', testType:'DPT on SS-1004 repaired welds', bomCode:'SS-1004',
+     lab:'In-house NDT', 
+     scheduledFor:'24 May 2026', sampleCollected:null,
+     status:'scheduled', result:null, reportFile:null,
+     resultNote:'Triggered by NCR-007 closure — DPT on repaired welds before sign-off.', attestedBy:null,
+     linkedNCR:'NCR-007'},
+  ],
+  'P1.SP2': [],
+};

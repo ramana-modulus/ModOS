@@ -1,0 +1,111 @@
+import type { ClientBill } from "@/features/billing/types";
+
+/**
+ * BILL_CLIENT — outgoing RA bills (Modulus → Client), per (project.subproject).
+ * Ported verbatim from modos_v436.html (line 26184). These are the lifecycle
+ * DOCUMENTS (submit → certify → invoice → pay); line values project off the
+ * measurement spine. RA-1 is paid; RA-2 is a draft.
+ */
+export const BILL_CLIENT: Record<string, ClientBill[]> = {
+  "P1.SP1": [
+    {
+      id: "RA-1",
+      billNo: "MH/ORG/RA1/2026",
+      billDate: "15 May 2026",
+      periodFrom: "01 Apr 2026",
+      periodTo: "15 May 2026",
+      status: "paid",
+      preparedBy: "Suresh (Billing Engg.)",
+      submittedOn: "15 May 2026",
+      certifiedOn: "19 May 2026",
+      certifiedBy: "Mr. Kesavan (Client Rep)",
+      invoicedOn: "20 May 2026",
+      invoiceNo: "MH/INV/2026/047",
+      paidOn: "22 May 2026",
+      paymentRef: "NEFT-KSV2026-058",
+      claimedAmount: 2460000,
+      certifiedAmount: 2460000,
+      retention: 123000,
+      netCertified: 2337000,
+      gst: 420660,
+      finalPayable: 2757660,
+      reductionNote:
+        "Raw-material lines (SS-M-101/102/103) removed from client AR — material is AP-only (Procurement → Finance), never a client claim. RA-1 bills mobilization + engineering only.",
+      lineItems: [
+        {
+          code: "MOBIL-01",
+          name: "Site Mobilization + Office Setup",
+          uom: "LS",
+          plannedQty: 1,
+          cumDone: 1,
+          prevBilled: 0,
+          thisBill: 1,
+          rate: 1500000,
+          amount: 1500000,
+        },
+        {
+          code: "DESIGN-01",
+          name: "Engineering + Detailed Drawings",
+          uom: "LS",
+          plannedQty: 1,
+          cumDone: 0.8,
+          prevBilled: 0,
+          thisBill: 0.8,
+          rate: 1200000,
+          amount: 960000,
+        },
+      ],
+      attachments: ["Measurement_RA1.xlsx", "Photos_RA1.pdf", "QC_Sign-off_RA1.pdf", "Tax_Invoice_INV047.pdf"],
+    },
+    {
+      id: "RA-2",
+      billNo: "MH/ORG/RA2/2026 (draft)",
+      billDate: "23 May 2026",
+      periodFrom: "16 May 2026",
+      periodTo: "23 May 2026 (in-progress)",
+      status: "draft",
+      preparedBy: "Suresh (Billing Engg.)",
+      submittedOn: null,
+      certifiedOn: null,
+      invoicedOn: null,
+      paidOn: null,
+      claimedAmount: 180000,
+      certifiedAmount: null,
+      retention: null,
+      netCertified: null,
+      gst: null,
+      finalPayable: null,
+      lineItems: [
+        {
+          code: "DESIGN-01",
+          name: "Engineering (balance)",
+          uom: "LS",
+          plannedQty: 1,
+          cumDone: 0.95,
+          prevBilled: 0.8,
+          thisBill: 0.15,
+          rate: 1200000,
+          amount: 180000,
+          note: "GFC drawings ~95% complete.",
+        },
+      ],
+      attachments: [],
+      blockers: [],
+    },
+  ],
+  "P1.SP2": [
+    {
+      id: "RA-1",
+      billNo: "MH/ORG-B/RA1/2026 (draft)",
+      billDate: "—",
+      periodFrom: "—",
+      periodTo: "—",
+      status: "draft",
+      claimedAmount: 0,
+      certifiedAmount: null,
+      lineItems: [],
+      attachments: [],
+      blockers: ["Porta Cabin B still in design — no executable work yet."],
+    },
+  ],
+};

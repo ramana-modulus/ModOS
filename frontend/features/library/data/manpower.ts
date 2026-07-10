@@ -1,0 +1,45 @@
+import type { LibManpower } from "@/features/library/types";
+
+export const LIB_MANPOWER: LibManpower[] = [
+  // MP-10xx | Unskilled Labour
+  {code:'MP-1001',group:'MP-10xx',groupLabel:'Unskilled Labour',trade:'General Unskilled Labour (Coolie / Helper)',skill:'Unskilled',uom:'Day',rateN:850,rateS:800,rateE:800,rateW:820,remarks:'General site cleaning, material shifting, mixing support'},
+  {code:'MP-1002',group:'MP-10xx',groupLabel:'Unskilled Labour',trade:'Beldar (Earth Work Helper)',skill:'Unskilled',uom:'Day',rateN:900,rateS:850,rateE:850,rateW:870,remarks:'Digging, backfilling, compaction assistance'},
+  {code:'MP-1003',group:'MP-10xx',groupLabel:'Unskilled Labour',trade:'Bhisti (Water Carrier)',skill:'Unskilled',uom:'Day',rateN:750,rateS:700,rateE:700,rateW:720,remarks:'Water supply for curing, mixing, site use'},
+  {code:'MP-1004',group:'MP-10xx',groupLabel:'Unskilled Labour',trade:'Mate (Gang Supervisor – Unskilled)',skill:'Unskilled',uom:'Day',rateN:1000,rateS:950,rateE:950,rateW:970,remarks:'Supervises unskilled gang; issues tools; basic reporting'},
+  {code:'MP-1005',group:'MP-10xx',groupLabel:'Unskilled Labour',trade:'Security Guard (Unarmed – 8 hr shift)',skill:'Unskilled',uom:'Day',rateN:1000,rateS:950,rateE:950,rateW:950,remarks:'Site access control, material watch, day/night shift'},
+  {code:'MP-1006',group:'MP-10xx',groupLabel:'Unskilled Labour',trade:'Security Guard (Armed – 8 hr shift)',skill:'Unskilled',uom:'Day',rateN:1200,rateS:1150,rateE:1150,rateW:1150,remarks:'Armed guard; high-value site; coordination with agency'},
+  {code:'MP-1007',group:'MP-10xx',groupLabel:'Unskilled Labour',trade:'Chowkidar (Night Watchman)',skill:'Unskilled',uom:'Day',rateN:900,rateS:850,rateE:850,rateW:870,remarks:'Overnight site watch; key custody; attendance register'},
+  {code:'MP-1008',group:'MP-10xx',groupLabel:'Unskilled Labour',trade:'Sweeper / Housekeeping',skill:'Unskilled',uom:'Day',rateN:800,rateS:750,rateE:750,rateW:760,remarks:'Site & office cleaning, waste segregation'},
+  // MP-20xx | Semi-Skilled Labour
+  {code:'MP-2001',group:'MP-20xx',groupLabel:'Semi-Skilled Labour',trade:'Mason – 2nd Class',skill:'Semi-Skilled',uom:'Day',rateN:1000,rateS:950,rateE:950,rateW:970,remarks:'Brickwork, block laying, plaster assist under supervision'},
+  {code:'MP-2002',group:'MP-20xx',groupLabel:'Semi-Skilled Labour',trade:'Carpenter – 2nd Class',skill:'Semi-Skilled',uom:'Day',rateN:1000,rateS:950,rateE:950,rateW:970,remarks:'Formwork fixing, shuttering assist, basic joinery'},
+  {code:'MP-2003',group:'MP-20xx',groupLabel:'Semi-Skilled Labour',trade:'Bar Bender / Steel Fixer – Helper',skill:'Semi-Skilled',uom:'Day',rateN:950,rateS:900,rateE:900,rateW:920,remarks:'Cutting, bending, tying rebar under skilled supervision'},
+  {code:'MP-2004',group:'MP-20xx',groupLabel:'Semi-Skilled Labour',trade:'Painter – 2nd Class',skill:'Semi-Skilled',uom:'Day',rateN:950,rateS:900,rateE:900,rateW:920,remarks:'Primer, putty, basic paint application under supervision'},
+  {code:'MP-2005',group:'MP-20xx',groupLabel:'Semi-Skilled Labour',trade:'Plumber Helper',skill:'Semi-Skilled',uom:'Day',rateN:900,rateS:850,rateE:850,rateW:870,remarks:'Pipe cutting, threading assist, trench support'},
+  {code:'MP-2006',group:'MP-20xx',groupLabel:'Semi-Skilled Labour',trade:'Electrician Helper / Wire Man',skill:'Semi-Skilled',uom:'Day',rateN:950,rateS:900,rateE:900,rateW:920,remarks:'Conduit fixing, pull wire, panel assist under supervision'},
+  {code:'MP-2007',group:'MP-20xx',groupLabel:'Semi-Skilled Labour',trade:'Welder Helper / Gas Cutter Helper',skill:'Semi-Skilled',uom:'Day',rateN:900,rateS:850,rateE:850,rateW:870,remarks:'Material holding, grinding, cleanup for welder'},
+  {code:'MP-2008',group:'MP-20xx',groupLabel:'Semi-Skilled Labour',trade:'Polisher – 2nd Class',skill:'Semi-Skilled',uom:'Day',rateN:1000,rateS:950,rateE:950,rateW:970,remarks:'Machine-assisted floor/wall polishing, basic finishing'},
+  {code:'MP-2009',group:'MP-20xx',groupLabel:'Semi-Skilled Labour',trade:'Tile Layer Helper',skill:'Semi-Skilled',uom:'Day',rateN:950,rateS:900,rateE:900,rateW:920,remarks:'Mortar mixing, tile cleaning, grouting assist'},
+  {code:'MP-2010',group:'MP-20xx',groupLabel:'Semi-Skilled Labour',trade:'Scaffolding Helper',skill:'Semi-Skilled',uom:'Day',rateN:950,rateS:900,rateE:900,rateW:920,remarks:'Erecting & dismantling basic scaffolding under supervision'},
+  // MP-30xx | Skilled Labour (Tradesman)
+  {code:'MP-3001',group:'MP-30xx',groupLabel:'Skilled Labour (Tradesman)',trade:'Mason – 1st Class',skill:'Skilled',uom:'Day',rateN:1200,rateS:1150,rateE:1100,rateW:1150,remarks:'Brickwork, block work, plastering, tiling, pointing'},
+  {code:'MP-3002',group:'MP-30xx',groupLabel:'Skilled Labour (Tradesman)',trade:'Carpenter – 1st Class (Formwork)',skill:'Skilled',uom:'Day',rateN:1200,rateS:1150,rateE:1100,rateW:1150,remarks:'Column, beam, slab shuttering; centering & deshuttering'},
+  {code:'MP-3003',group:'MP-30xx',groupLabel:'Skilled Labour (Tradesman)',trade:'Bar Bender / Steel Fixer – 1st Class',skill:'Skilled',uom:'Day',rateN:1150,rateS:1100,rateE:1050,rateW:1100,remarks:'Column, beam, slab rebar; lap, hook, cover block'},
+  {code:'MP-3004',group:'MP-30xx',groupLabel:'Skilled Labour (Tradesman)',trade:'Painter – 1st Class',skill:'Skilled',uom:'Day',rateN:1100,rateS:1050,rateE:1000,rateW:1050,remarks:'Emulsion, enamel, texture; wall & ceiling finishing'},
+  {code:'MP-3005',group:'MP-30xx',groupLabel:'Skilled Labour (Tradesman)',trade:'Plumber – 1st Class',skill:'Skilled',uom:'Day',rateN:1150,rateS:1100,rateE:1050,rateW:1100,remarks:'CPVC/UPVC, CI, GI pipe; sanitary fitting, testing'},
+  {code:'MP-3006',group:'MP-30xx',groupLabel:'Skilled Labour (Tradesman)',trade:'Electrician – Licensed (LT)',skill:'Skilled',uom:'Day',rateN:1200,rateS:1150,rateE:1100,rateW:1150,remarks:'Conduit, DB, MCB, ELCB, wiring & testing'},
+  {code:'MP-3007',group:'MP-30xx',groupLabel:'Skilled Labour (Tradesman)',trade:'Welder – SMAW / MIG',skill:'Skilled',uom:'Day',rateN:1300,rateS:1250,rateE:1200,rateW:1250,remarks:'Structural fillet & butt weld; pressure vessel extra'},
+  {code:'MP-3008',group:'MP-30xx',groupLabel:'Skilled Labour (Tradesman)',trade:'Steel Fabricator / Fitter',skill:'Skilled',uom:'Day',rateN:1200,rateS:1150,rateE:1100,rateW:1150,remarks:'Layout, cutting, drilling, fit-up; pre-paint prep'},
+  {code:'MP-3009',group:'MP-30xx',groupLabel:'Skilled Labour (Tradesman)',trade:'Steel Erector / Rigger',skill:'Skilled',uom:'Day',rateN:1300,rateS:1250,rateE:1200,rateW:1250,remarks:'Structural steel erection with crane; alignment, bolting'},
+  {code:'MP-3010',group:'MP-30xx',groupLabel:'Skilled Labour (Tradesman)',trade:'Tile / Stone Layer – 1st Class',skill:'Skilled',uom:'Day',rateN:1200,rateS:1150,rateE:1100,rateW:1150,remarks:'Vitrified, ceramic, granite; bed mortar, grouting'},
+  {code:'MP-3011',group:'MP-30xx',groupLabel:'Skilled Labour (Tradesman)',trade:'False Ceiling Fitter',skill:'Skilled',uom:'Day',rateN:1150,rateS:1100,rateE:1050,rateW:1100,remarks:'GI grid, gypsum / calcium silicate tile, perimeter angle'},
+  {code:'MP-3012',group:'MP-30xx',groupLabel:'Skilled Labour (Tradesman)',trade:'HVAC Duct Fitter',skill:'Skilled',uom:'Day',rateN:1250,rateS:1200,rateE:1150,rateW:1200,remarks:'GI ducting fabrication & installation; insulation wrap'},
+  {code:'MP-3013',group:'MP-30xx',groupLabel:'Skilled Labour (Tradesman)',trade:'Aluminium / Glazing Fitter',skill:'Skilled',uom:'Day',rateN:1200,rateS:1150,rateE:1100,rateW:1150,remarks:'Curtain wall, window, ACP panel; silicon sealing'},
+  {code:'MP-3014',group:'MP-30xx',groupLabel:'Skilled Labour (Tradesman)',trade:'Carpenter / Door Fitter',skill:'Skilled',uom:'Day',rateN:1100,rateS:1050,rateE:1000,rateW:1050,remarks:'Door shutter & frame fixing; hardware fitting; joinery'},
+  // MP-40xx | Supervisory / Technical
+  {code:'MP-4001',group:'MP-40xx',groupLabel:'Supervisory / Technical',trade:'Foreman / Charge Hand',skill:'Professional',uom:'Day',rateN:1500,rateS:1400,rateE:1350,rateW:1400,remarks:'Supervises 8–15 workers; daily progress, QC checks'},
+  {code:'MP-4002',group:'MP-40xx',groupLabel:'Supervisory / Technical',trade:'Site Supervisor / Junior Engineer',skill:'Professional',uom:'Day',rateN:2000,rateS:1800,rateE:1700,rateW:1800,remarks:'Diploma Engg; drawings, measurements, daily report'},
+  {code:'MP-4003',group:'MP-40xx',groupLabel:'Supervisory / Technical',trade:'Safety Officer (Construction)',skill:'Professional',uom:'Day',rateN:2500,rateS:2200,rateE:2000,rateW:2200,remarks:'NEBOSH / IOSH; toolbox talk, PPE audit, incident report'},
+  {code:'MP-4004',group:'MP-40xx',groupLabel:'Supervisory / Technical',trade:'QC Inspector',skill:'Professional',uom:'Day',rateN:2200,rateS:2000,rateE:1900,rateW:2000,remarks:'Material inspection, weld/concrete QC, punch list'},
+  {code:'MP-4005',group:'MP-40xx',groupLabel:'Supervisory / Technical',trade:'Surveyor (Land / Quantity)',skill:'Professional',uom:'Day',rateN:2500,rateS:2200,rateE:2100,rateW:2200,remarks:'Setting out, levelling, quantity measurement'},
+];
