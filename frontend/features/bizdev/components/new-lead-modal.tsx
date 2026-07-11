@@ -31,12 +31,14 @@ export function NewLeadModal({
   const [tech, setTech] = useState("PEB");
   const [area, setArea] = useState("");
   const [ev, setEv] = useState("");
+  const [dl, setDl] = useState("");
+  const [owner, setOwner] = useState("gautham.g");
   const [tr, setTr] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const reset = () => {
-    setClient(""); setCo(""); setDesc(""); setArea(""); setEv(""); setTr(""); setError(null);
+    setClient(""); setCo(""); setDesc(""); setArea(""); setEv(""); setDl(""); setTr(""); setError(null);
   };
 
   async function submit() {
@@ -54,6 +56,8 @@ export function NewLeadModal({
         desc: desc.trim(),
         area: area ? parseInt(area, 10) : 0,
         ev: ev ? parseInt(ev, 10) : null,
+        dl: dl.trim() || null,
+        owner: owner.trim() || undefined,
         tr: type === "B2G" ? tr.trim() : undefined,
       });
       reset();
@@ -69,12 +73,11 @@ export function NewLeadModal({
       open={open}
       onClose={onClose}
       title="New Lead"
-      subtitle="Adds to the Leads pipeline (enquiry stage)"
       width={560}
       footer={
         <>
           <Button variant="default" onClick={onClose}>Cancel</Button>
-          <Button variant="primary" disabled={busy} onClick={submit}>{busy ? "Creating…" : "Create Lead"}</Button>
+          <Button variant="primary" disabled={busy} onClick={submit}>{busy ? "Creating…" : "Create lead"}</Button>
         </>
       }
     >
@@ -102,7 +105,7 @@ export function NewLeadModal({
 
       <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
         <div>
-          <label className={labelCls}>Client (contact) *</label>
+          <label className={labelCls}>Client (contact)</label>
           <input className={inputCls} value={client} onChange={(e) => setClient(e.target.value)} placeholder="e.g. Kesavan" />
         </div>
         <div>
@@ -111,26 +114,37 @@ export function NewLeadModal({
         </div>
       </div>
 
-      <div className="mt-3">
-        <label className={labelCls}>Description / Scope *</label>
-        <input className={inputCls} value={desc} onChange={(e) => setDesc(e.target.value)} placeholder="e.g. PEB Warehouse — 14,100 sqft" />
-      </div>
-
-      <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-3">
+      <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
         <div>
-          <label className={labelCls}>Tech</label>
+          <label className={labelCls}>Description / Scope</label>
+          <input className={inputCls} value={desc} onChange={(e) => setDesc(e.target.value)} placeholder="e.g. PEB Warehouse — 14,100 sqft" />
+        </div>
+        <div>
+          <label className={labelCls}>Product / Tech</label>
           <select className={inputCls} value={tech} onChange={(e) => setTech(e.target.value)}>
             {TECHS.map((t) => <option key={t}>{t}</option>)}
           </select>
         </div>
+      </div>
+
+      <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-3">
         <div>
-          <label className={labelCls}>Area (sqft)</label>
-          <input className={inputCls} type="number" value={area} onChange={(e) => setArea(e.target.value)} placeholder="0" />
+          <label className={labelCls}>Floor Area (sqft)</label>
+          <input className={inputCls} type="number" value={area} onChange={(e) => setArea(e.target.value)} placeholder="14100" />
         </div>
         <div>
           <label className={labelCls}>Est. Value (₹)</label>
           <input className={inputCls} type="number" value={ev} onChange={(e) => setEv(e.target.value)} placeholder="optional" />
         </div>
+        <div>
+          <label className={labelCls}>Deadline</label>
+          <input className={inputCls} value={dl} onChange={(e) => setDl(e.target.value)} placeholder="e.g. 28 May 2026" />
+        </div>
+      </div>
+
+      <div className="mt-3">
+        <label className={labelCls}>Owner</label>
+        <input className={inputCls} value={owner} onChange={(e) => setOwner(e.target.value)} placeholder="e.g. gautham.g" />
       </div>
 
       {type === "B2G" && (
