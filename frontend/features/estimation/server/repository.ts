@@ -60,6 +60,7 @@ export function getEstimation(project?: string): EstimationPayload {
     items: sp.items,
     unitRateExcl: subProjectUnitRateExcl(sp.items, EST_CONFIG),
     totalIncl: subProjectTotalIncl(sp.items, sp.units, EST_CONFIG),
+    wf: sp.wf,
   }));
 
   const overviewTotalIncl = subProjects.reduce((s, sp) => s + sp.totalIncl, 0);

@@ -1,17 +1,32 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Modal } from "@/components/ui/modal";
+import { Button } from "@/components/ui/button";
 import { estimationApi } from "@/features/estimation/api";
 import type { EstSubProjectView } from "@/features/estimation/api";
 import { useQuery } from "@/features/procurement/hooks/use-query";
 import { grandTotals } from "@/features/estimation/domain";
+import { EST_RFIS_SEED } from "@/features/estimation/data/rfis";
 import { CostingSheet } from "./costing-sheet";
 import { SubProjectOverview } from "./subproject-overview";
 import { SummaryTab } from "./summary-tab";
 import { VersionsTab } from "./versions-tab";
+import { RfiTab } from "./rfi-tab";
+import { TenderDocsTab } from "./tender-docs-tab";
+import { EstWorkflowTab } from "./est-workflow-tab";
 
-type Sub = "sheet" | "summary" | "versions";
+type Sub = "sheet" | "summary" | "versions" | "rfi" | "docs" | "workflow";
 type EstType = "EPC" | "BOQ" | "B2G";
+
+const TABS: { key: Sub; label: string }[] = [
+  { key: "sheet", label: "Costing Sheet" },
+  { key: "summary", label: "Summary" },
+  { key: "versions", label: "Versions" },
+  { key: "rfi", label: "RFI to Contracts" },
+  { key: "docs", label: "Tender Docs (BD)" },
+  { key: "workflow", label: "Approval Workflow" },
+];
 
 const TYPES: { key: EstType; label: string }[] = [
   { key: "EPC", label: "EPC" },
@@ -20,6 +35,7 @@ const TYPES: { key: EstType; label: string }[] = [
 ];
 
 const lakh1 = (n: number) => `₹${(n / 100000).toFixed(1)}L`;
+const DEMO_TODAY = "23 May 2026";
 
 function subDotColor(status: EstSubProjectView["status"]): string {
   if (status === "approved") return "#3B6D11";
@@ -39,6 +55,8 @@ export function EstimationPage() {
   const [estType, setEstType] = useState<EstType>("EPC");
   const [version, setVersion] = useState("V3");
   const [units, setUnits] = useState(1);
+  const [submitOpen, setSubmitOpen] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
 
   const { data, loading, error } = useQuery(() => estimationApi.getEstimation(project ?? undefined), [project]);
 
@@ -60,6 +78,9 @@ export function EstimationPage() {
   const { grandTotalExcl, grandTotalIncl, primeCostTotal } = grandTotals(activeItems, config);
   const allApproved = subProjects.length > 0 && subProjects.every((s) => s.status === "approved");
   const activeVersion = versions.find((v) => v.v === version) ?? versions[0];
+  const rfiCount = EST_RFIS_SEED.filter((r) => r.tenderId === lead.id && r.status !== "closed").length;
+  const wfPending = !!activeSub && activeSub.wf.status !== "approved";
+  const isSubmitted = lead.costingSubmitted || submitted;
 
   const selectProject = (id: string) => {
     setProject(id);
@@ -159,9 +180,15 @@ export function EstimationPage() {
           {/* Toolbar: sub-tabs + type pills + version selector */}
           <div className="est-toolbar" style={{ marginBottom: "6px" }}>
             <div className="vtabs" style={{ marginBottom: 0, flex: 1 }}>
-              {(["sheet", "summary", "versions"] as const).map((k) => (
-                <div key={k} className={`vt${sub === k ? " active" : ""}`} onClick={() => setSub(k)}>
-                  {k === "sheet" ? "Costing Sheet" : k === "summary" ? "Summary" : "Versions"}
+              {TABS.map((t) => (
+                <div key={t.key} className={`vt${sub === t.key ? " active" : ""}`} onClick={() => setSub(t.key)} style={{ position: "relative" }}>
+                  {t.label}
+                  {t.key === "rfi" && rfiCount > 0 && (
+                    <span style={{ marginLeft: 4, background: "#854F0B", color: "#fff", fontSize: "9px", padding: "0 5px", borderRadius: "8px", fontWeight: 600 }}>{rfiCount}</span>
+                  )}
+                  {t.key === "workflow" && wfPending && (
+                    <span style={{ marginLeft: 5, display: "inline-block", width: 6, height: 6, borderRadius: "50%", background: "#C84B2F", verticalAlign: "middle" }} />
+                  )}
                 </div>
               ))}
             </div>
@@ -178,6 +205,8 @@ export function EstimationPage() {
                   <option key={v.v} value={v.v}>{v.label}</option>
                 ))}
               </select>
+              <button type="button" className="tbb" style={{ fontSize: "10px" }} title="Create a new costing version (demo)">+ Version</button>
+              <button type="button" className="tbb" style={{ fontSize: "10px" }} title="Export the costing sheet to Excel (demo)">↓ Excel</button>
             </div>
           </div>
 
@@ -224,11 +253,29 @@ export function EstimationPage() {
 
           {/* Active tab content */}
           {sub === "sheet" && (
-            <CostingSheet items={activeItems} categories={categories} config={config} area={lead.area} statusBanner={statusChip} />
+            <CostingSheet
+              key={subProjectId ?? "none"}
+              items={activeItems}
+              categories={categories}
+              config={config}
+              area={lead.area}
+              statusBanner={statusChip}
+              headerActions={
+                isSubmitted ? (
+                  <span style={{ display: "flex", alignItems: "center", gap: 6, padding: "5px 12px", background: "#EAF3DE", border: "0.5px solid #C0DD97", borderRadius: 5, fontSize: 11, fontWeight: 600, color: "#3B6D11" }}>
+                    ✓ Submitted · Awaiting Review
+                  </span>
+                ) : (
+                  <button type="button" onClick={() => setSubmitOpen(true)} style={{ padding: "5px 14px", background: "var(--ac)", color: "#fff", border: "none", borderRadius: 5, fontSize: 11, fontWeight: 600, cursor: "pointer" }}>
+                    ✈ Submit for Review
+                  </button>
+                )
+              }
+            />
           )}
           {sub === "summary" && (
             <div className="-mx-3.5 flex min-h-0 flex-1 flex-col overflow-y-auto px-3.5 pb-3">
-              <SummaryTab items={activeItems} categories={categories} config={config} area={lead.area} units={units} estType={estType} costingSubmitted={lead.costingSubmitted} />
+              <SummaryTab items={activeItems} categories={categories} config={config} area={lead.area} units={units} estType={estType} costingSubmitted={isSubmitted} />
             </div>
           )}
           {sub === "versions" && (
@@ -236,8 +283,45 @@ export function EstimationPage() {
               <VersionsTab versions={versions} />
             </div>
           )}
+          {sub === "rfi" && (
+            <div className="-mx-3.5 flex min-h-0 flex-1 flex-col overflow-y-auto px-3.5 pb-3">
+              <RfiTab projectId={lead.id} clientName={lead.client || lead.co} today={DEMO_TODAY} />
+            </div>
+          )}
+          {sub === "docs" && (
+            <div className="-mx-3.5 flex min-h-0 flex-1 flex-col overflow-y-auto px-3.5 pb-3">
+              <TenderDocsTab docs={lead.docs} co={lead.co} date={lead.dl || "02 May 2026"} owner="BD Team" />
+            </div>
+          )}
+          {sub === "workflow" && (
+            <div className="-mx-3.5 flex min-h-0 flex-1 flex-col overflow-y-auto px-3.5 pb-3">
+              {activeSub ? (
+                <EstWorkflowTab key={activeSub.id} wf={activeSub.wf} today={DEMO_TODAY} />
+              ) : (
+                <div className="px-3.5 py-8 text-center text-t11 text-faint">Select a sub-project to view its approval workflow.</div>
+              )}
+            </div>
+          )}
         </>
       )}
+
+      <Modal
+        open={submitOpen}
+        onClose={() => setSubmitOpen(false)}
+        title="Submit Costing for Review"
+        width={480}
+        footer={
+          <>
+            <Button variant="default" onClick={() => setSubmitOpen(false)}>Cancel</Button>
+            <Button variant="primary" onClick={() => { setSubmitted(true); setSubmitOpen(false); setSub("summary"); }}>Submit for Review →</Button>
+          </>
+        }
+      >
+        <p className="text-t11 leading-relaxed text-ink-soft">
+          Submitting locks the costing sheet, generates the <strong>Summary</strong>, triggers the approval workflow
+          (Maker → Checker → Approver), and notifies the BD team.
+        </p>
+      </Modal>
     </div>
   );
 }

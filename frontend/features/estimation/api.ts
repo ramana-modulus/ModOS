@@ -1,4 +1,4 @@
-import type { EstCategory, EstConfig, EstItem, EstVersion } from "@/features/estimation/types";
+import type { EstCategory, EstConfig, EstItem, EstSubProjectWf, EstVersion } from "@/features/estimation/types";
 import { apiGet } from "@/lib/http";
 
 /** A lead reduced to what the costing-queue selector needs. */
@@ -25,6 +25,8 @@ export interface EstSubProjectView {
   unitRateExcl: number;
   /** Total incl. GST across all units. */
   totalIncl: number;
+  /** Maker → Checker → Approver → BD approval workflow for this sub-project. */
+  wf: EstSubProjectWf;
 }
 
 /** The active lead/project header shown above the costing surface. */

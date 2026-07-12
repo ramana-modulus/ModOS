@@ -88,6 +88,19 @@ export interface EstSubProject {
   wf: EstSubProjectWf;
 }
 
+/** An RFI (Request For Information) raised from Estimation to Contracts. */
+export interface EstRfi {
+  id: string;
+  tenderId: string;
+  raisedBy: string;
+  raisedOn: string;
+  question: string;
+  answer: string;
+  answeredBy: string;
+  answeredOn: string;
+  status: "open" | "answered" | "closed";
+}
+
 /** A BD lead in the costing queue (the Estimation "project"). */
 export interface EstLead {
   id: string;
