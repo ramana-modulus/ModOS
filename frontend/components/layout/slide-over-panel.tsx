@@ -22,12 +22,14 @@ export function SlideOverPanel() {
 
   return (
     <>
-      {/* Backdrop */}
+      {/* Click-catcher — the prototype docks the panel with no dimmed
+          backdrop, so this stays fully transparent and only serves to close
+          the panel on an outside click. */}
       <div
-        aria-hidden={!panel}
+        aria-hidden
         onClick={closePanel}
-        className={`absolute inset-0 z-10 bg-ink/20 transition-opacity duration-150 ${
-          panel ? "opacity-100" : "pointer-events-none opacity-0"
+        className={`absolute inset-0 z-10 ${
+          panel ? "" : "pointer-events-none"
         }`}
       />
       <aside
@@ -36,7 +38,7 @@ export function SlideOverPanel() {
         aria-label={panel?.title}
         aria-hidden={!panel}
         style={{ width: panel?.width ?? 380 }}
-        className={`absolute right-0 top-0 bottom-0 z-20 flex max-w-[92vw] flex-col border-l border-line bg-surface shadow-[-4px_0_16px_rgba(0,0,0,0.06)] transition-transform duration-200 ${
+        className={`absolute right-0 top-0 bottom-0 z-20 flex max-w-[92vw] flex-col border-l-[0.5px] border-line bg-surface shadow-[-4px_0_16px_rgba(0,0,0,0.06)] transition-transform duration-200 ${
           panel ? "translate-x-0" : "translate-x-full"
         }`}
       >

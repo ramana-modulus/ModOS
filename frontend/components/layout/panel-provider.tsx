@@ -4,10 +4,12 @@ import {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useMemo,
   useState,
   type ReactNode,
 } from "react";
+import { usePathname } from "next/navigation";
 
 export interface PanelContent {
   /** Monospace tag chip shown above the title (e.g. an item/RFQ code). */
@@ -34,9 +36,16 @@ const PanelContext = createContext<PanelContextValue | null>(null);
  */
 export function PanelProvider({ children }: { children: ReactNode }) {
   const [panel, setPanel] = useState<PanelContent | null>(null);
+  const pathname = usePathname();
 
   const openPanel = useCallback((content: PanelContent) => setPanel(content), []);
   const closePanel = useCallback(() => setPanel(null), []);
+
+  // Auto-close the slide-over whenever the route changes (mirrors the
+  // prototype's closeAllPanels() firing on any page-level navigation).
+  useEffect(() => {
+    setPanel(null);
+  }, [pathname]);
 
   const value = useMemo(
     () => ({ panel, openPanel, closePanel }),
