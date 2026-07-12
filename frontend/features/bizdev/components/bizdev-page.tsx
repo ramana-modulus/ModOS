@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { bizdevApi } from "@/features/bizdev/api";
+import { usePanel } from "@/components/layout/panel-provider";
 import { useQuery } from "@/features/procurement/hooks/use-query";
 import type { LeadView } from "@/features/bizdev/types";
 import { LeadsList } from "./leads-list";
@@ -27,6 +28,14 @@ export function BizDevPage() {
   const [type, setType] = useState<"all" | "b2b" | "b2g">("all");
   const [view, setView] = useState<"kanban" | "list">("kanban");
   const [newLeadOpen, setNewLeadOpen] = useState(false);
+  const [editingLead, setEditingLead] = useState<LeadView | null>(null);
+  const { closePanel } = usePanel();
+
+  // Switching the Leads/Deals tab dismisses any open lead/deal slide-over.
+  const switchSub = (next: "leads" | "deals") => {
+    setSub(next);
+    closePanel();
+  };
 
   const leadsAll = useMemo(() => data?.leads ?? [], [data]);
   const leads = leadsAll.filter((l) => l.type === "B2B" && l.status === "enquiry");
@@ -42,10 +51,10 @@ export function BizDevPage() {
     <div className="flex min-h-0 flex-1 flex-col">
       {/* Top tabs */}
       <div className="vtabs mb-3">
-        <div className={`vt${sub === "leads" ? " active" : ""}`} onClick={() => setSub("leads")}>
+        <div className={`vt${sub === "leads" ? " active" : ""}`} onClick={() => switchSub("leads")}>
           Leads <span className="ml-0.5 rounded-lg bg-neutral-soft px-[5px] py-px text-t9">{leads.length}</span>
         </div>
-        <div className={`vt${sub === "deals" ? " active" : ""}`} onClick={() => setSub("deals")}>
+        <div className={`vt${sub === "deals" ? " active" : ""}`} onClick={() => switchSub("deals")}>
           Deals <span className="ml-0.5 rounded-lg bg-neutral-soft px-[5px] py-px text-t9">{deals.length}</span>
         </div>
       </div>
@@ -110,18 +119,25 @@ export function BizDevPage() {
 
       {/* Body */}
       <div className="-mx-3.5 min-h-0 flex-1 overflow-auto px-3.5 pb-3">
-        {sub === "leads" && <LeadsList leads={leads} stages={stages} thresholds={thresholds} onMutated={refetch} />}
-        {sub === "deals" && view === "kanban" && <DealsKanban leads={filteredDeals} stages={stages} thresholds={thresholds} onMutated={refetch} />}
-        {sub === "deals" && view === "list" && <DealsList leads={filteredDeals} stages={stages} thresholds={thresholds} onMutated={refetch} />}
+        {sub === "leads" && <LeadsList leads={leads} stages={stages} thresholds={thresholds} onMutated={refetch} onEditLead={setEditingLead} />}
+        {sub === "deals" && view === "kanban" && <DealsKanban leads={filteredDeals} stages={stages} thresholds={thresholds} onMutated={refetch} onEditLead={setEditingLead} />}
+        {sub === "deals" && view === "list" && <DealsList leads={filteredDeals} stages={stages} thresholds={thresholds} onMutated={refetch} onEditLead={setEditingLead} />}
       </div>
 
       <NewLeadModal
-        open={newLeadOpen}
-        defaultType={sub === "leads" ? "B2B" : "B2B"}
-        onClose={() => setNewLeadOpen(false)}
-        onCreated={() => {
+        key={editingLead?.id ?? "new"}
+        open={newLeadOpen || editingLead !== null}
+        defaultType="B2B"
+        editLead={editingLead ?? undefined}
+        onClose={() => {
           setNewLeadOpen(false);
-          setSub("leads");
+          setEditingLead(null);
+        }}
+        onCreated={() => {
+          const wasEdit = editingLead !== null;
+          setNewLeadOpen(false);
+          setEditingLead(null);
+          if (!wasEdit) setSub("leads");
           refetch();
         }}
       />

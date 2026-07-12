@@ -82,6 +82,26 @@ export interface CreateLeadInput {
   tr?: string;
 }
 
+/** Edit an existing lead's editable fields in place (`openEditLeadModal` → save). */
+export function updateLead(id: string, patch: Partial<CreateLeadInput>): LeadView {
+  const lead = leads.find((l) => l.id === id);
+  if (!lead) throw new Error(`Lead ${id} not found`);
+  if (patch.client !== undefined) lead.client = patch.client;
+  if (patch.co !== undefined) lead.co = patch.co || lead.client;
+  if (patch.desc !== undefined) lead.desc = patch.desc;
+  if (patch.type !== undefined) lead.type = (patch.type === "B2G" ? "B2G" : "B2B") as Lead["type"];
+  if (patch.lt !== undefined) lead.lt = patch.lt as Lead["lt"];
+  if (patch.src !== undefined) lead.src = patch.src;
+  if (patch.owner !== undefined) lead.owner = patch.owner;
+  if (patch.tech !== undefined) lead.tech = [patch.tech];
+  if (patch.ev !== undefined) lead.ev = patch.ev;
+  if (patch.area !== undefined) lead.area = patch.area;
+  if (patch.dl !== undefined) lead.dl = patch.dl;
+  // Tender ref only applies to B2G; clear it otherwise.
+  lead.tr = lead.type === "B2G" && patch.tr ? patch.tr : undefined;
+  return toView(lead);
+}
+
 function nextLeadId(): string {
   const max = leads.reduce((m, l) => {
     const n = Number(l.id.replace(/\D/g, ""));

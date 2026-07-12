@@ -4,36 +4,44 @@ import { useState } from "react";
 import { Modal } from "@/components/ui/modal";
 import { Button } from "@/components/ui/button";
 import { bizdevApi } from "@/features/bizdev/api";
+import type { LeadView } from "@/features/bizdev/types";
 
 const TECHS = ["PEB", "CISP", "Portacabin", "LGSF", "Kiosk", "Prefab Shelter"];
 const SOURCES = ["Inbound", "Outbound", "Palladium", "GeM", "Tender247", "Referral"];
 const inputCls = "w-full rounded-md border-[0.5px] border-input bg-surface px-2 py-1.5 text-t11 text-ink";
 const labelCls = "mb-1 block text-t9 uppercase tracking-[0.4px] text-faint";
 
-/** New-lead form (`openNewLeadModal` / `createLead`). */
+/**
+ * Lead form — creates a new lead (`createLead`) or, when `editLead` is passed,
+ * edits an existing one (`updateLead`). Mount with a `key` that changes between
+ * create/edit so the initial field values below re-seed on open.
+ */
 export function NewLeadModal({
   open,
   defaultType,
+  editLead,
   onClose,
   onCreated,
 }: {
   open: boolean;
   defaultType: string;
+  editLead?: LeadView;
   onClose: () => void;
   onCreated: () => void;
 }) {
-  const [type, setType] = useState(defaultType);
-  const [lt, setLt] = useState("Warm");
-  const [src, setSrc] = useState("Inbound");
-  const [client, setClient] = useState("");
-  const [co, setCo] = useState("");
-  const [desc, setDesc] = useState("");
-  const [tech, setTech] = useState("PEB");
-  const [area, setArea] = useState("");
-  const [ev, setEv] = useState("");
-  const [dl, setDl] = useState("");
-  const [owner, setOwner] = useState("gautham.g");
-  const [tr, setTr] = useState("");
+  const isEdit = !!editLead;
+  const [type, setType] = useState(editLead?.type ?? defaultType);
+  const [lt, setLt] = useState<string>(editLead?.lt ?? "Warm");
+  const [src, setSrc] = useState(editLead?.src ?? "Inbound");
+  const [client, setClient] = useState(editLead?.client ?? "");
+  const [co, setCo] = useState(editLead?.co ?? "");
+  const [desc, setDesc] = useState(editLead?.desc ?? "");
+  const [tech, setTech] = useState(editLead?.tech[0] ?? "PEB");
+  const [area, setArea] = useState(editLead?.area ? String(editLead.area) : "");
+  const [ev, setEv] = useState(editLead?.ev ? String(editLead.ev) : "");
+  const [dl, setDl] = useState(editLead?.dl ?? "");
+  const [owner, setOwner] = useState(editLead?.owner ?? "gautham.g");
+  const [tr, setTr] = useState(editLead?.tr ?? "");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -48,22 +56,27 @@ export function NewLeadModal({
     }
     setBusy(true);
     setError(null);
+    const input = {
+      type, lt, src, tech,
+      client: client.trim(),
+      co: co.trim() || undefined,
+      desc: desc.trim(),
+      area: area ? parseInt(area, 10) : 0,
+      ev: ev ? parseInt(ev, 10) : null,
+      dl: dl.trim() || null,
+      owner: owner.trim() || undefined,
+      tr: type === "B2G" ? tr.trim() : undefined,
+    };
     try {
-      await bizdevApi.createLead({
-        type, lt, src, tech,
-        client: client.trim(),
-        co: co.trim() || undefined,
-        desc: desc.trim(),
-        area: area ? parseInt(area, 10) : 0,
-        ev: ev ? parseInt(ev, 10) : null,
-        dl: dl.trim() || null,
-        owner: owner.trim() || undefined,
-        tr: type === "B2G" ? tr.trim() : undefined,
-      });
-      reset();
+      if (editLead) {
+        await bizdevApi.updateLead(editLead.id, input);
+      } else {
+        await bizdevApi.createLead(input);
+        reset();
+      }
       onCreated();
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Failed to create lead");
+      setError(e instanceof Error ? e.message : `Failed to ${isEdit ? "update" : "create"} lead`);
       setBusy(false);
     }
   }
@@ -72,12 +85,14 @@ export function NewLeadModal({
     <Modal
       open={open}
       onClose={onClose}
-      title="New Lead"
+      title={isEdit ? "Edit Lead" : "New Lead"}
       width={560}
       footer={
         <>
           <Button variant="default" onClick={onClose}>Cancel</Button>
-          <Button variant="primary" disabled={busy} onClick={submit}>{busy ? "Creating…" : "Create lead"}</Button>
+          <Button variant="primary" disabled={busy} onClick={submit}>
+            {busy ? (isEdit ? "Saving…" : "Creating…") : isEdit ? "Save changes" : "Create lead"}
+          </Button>
         </>
       }
     >

@@ -29,4 +29,6 @@ export const bizdevApi = {
   moveStage: (id: string, toStage: string) =>
     apiPost<{ lead: LeadView }>("/bizdev/move-stage", { id, toStage }),
   createLead: (input: NewLeadInput) => apiPost<{ lead: LeadView }>("/bizdev/lead", input),
+  updateLead: (id: string, input: NewLeadInput) =>
+    apiPost<{ lead: LeadView }>("/bizdev/lead/update", { id, ...input }),
 };

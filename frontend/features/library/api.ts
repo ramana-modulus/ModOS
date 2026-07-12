@@ -7,6 +7,7 @@ import type {
   LibTransport,
   LibHistoryEntry,
 } from "./types";
+import type { BudgetaryLineItem } from "./data/budgetary";
 import { apiGet } from "@/lib/http";
 
 export interface LibraryKpis {
@@ -25,6 +26,8 @@ export interface LibraryPayload {
   machinery: LibMachinery[];
   transport: LibTransport[];
   history: Record<string, LibHistoryEntry[]>;
+  /** Per-technology budgetary (enquiry-stage) rate cards. */
+  budgetary: Record<string, BudgetaryLineItem[]>;
   kpis: LibraryKpis;
 }
 

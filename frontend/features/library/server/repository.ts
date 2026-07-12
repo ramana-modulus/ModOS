@@ -8,6 +8,7 @@ import {
   LIB_TRANSPORT,
   LIB_ITEMS_HISTORY,
 } from "@/features/library/data";
+import { LIB_BUDGETARY } from "@/features/library/data/budgetary";
 import type { LibraryPayload } from "@/features/library/api";
 
 /** The full costing-library payload + KPI counts (static reference data). */
@@ -20,6 +21,7 @@ export function getLibrary(): LibraryPayload {
     machinery: LIB_MACHINERY,
     transport: LIB_TRANSPORT,
     history: LIB_ITEMS_HISTORY,
+    budgetary: LIB_BUDGETARY,
     kpis: {
       categories: LIB_CATEGORIES.length,
       boqItems: LIB_ITEMS.length,

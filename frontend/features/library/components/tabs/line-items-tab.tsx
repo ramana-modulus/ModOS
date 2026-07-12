@@ -4,6 +4,8 @@ import { Fragment, useState } from "react";
 import { IconHistory } from "@tabler/icons-react";
 import type { LibCategory, LibItem } from "@/features/library/types";
 import { calcTotalRate } from "@/features/library/types";
+import type { BudgetaryLineItem } from "@/features/library/data/budgetary";
+import { BQ_MARKUP_PCT, BQ_TECHS, quotedRate } from "@/features/library/data/budgetary";
 import { fmtR } from "@/lib/format";
 
 const GRID = "18px 90px 1fr 90px 82px 52px 62px 56px 90px 90px 80px 72px 56px 90px 80px";
@@ -23,10 +25,12 @@ export function LineItemsTab({
   items,
   categories,
   activeCat,
+  budgetary,
 }: {
   items: LibItem[];
   categories: LibCategory[];
   activeCat: string;
+  budgetary: Record<string, BudgetaryLineItem[]>;
 }) {
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
   const toggle = (code: string) =>
@@ -174,6 +178,60 @@ export function LineItemsTab({
           </Fragment>
         );
       })}
+
+      {/* Budgetary Costing — the enquiry-stage rate cards shared with the BizDev
+          lead panel's Budgetary Costing calculator (single source of truth in
+          features/library/data/budgetary.ts). Grouped by technology. */}
+      {(activeCat === "All" || activeCat === "BQ") && (
+        <Fragment>
+          <div className="flex min-w-[1100px] items-center gap-2.5 border-t-2 border-white/10 px-2.5 py-[7px]" style={{ background: "#5A3A7F" }}>
+            <span className="rounded bg-white/20 px-[7px] py-px font-mono text-t9 font-bold text-white">BQ</span>
+            <span className="text-t11 font-bold tracking-[0.3px] text-white">BUDGETARY COSTING</span>
+            <span className="ml-1 text-t9 text-white/60">— Enquiry-stage indicative ₹/sqft · {BQ_MARKUP_PCT}% markup</span>
+          </div>
+          {BQ_TECHS.map((tech) => {
+            const rows = budgetary[tech] || [];
+            if (!rows.length) return null;
+            return (
+              <Fragment key={tech}>
+                <div className="flex min-w-[1100px] items-center gap-2 border-t-[0.5px] border-[#D8C8E4] bg-[#EFE8F5] py-[5px] pl-7 pr-2.5">
+                  <span className="rounded border-[0.5px] border-[#D8C8E4] bg-white px-[5px] py-px font-mono text-t8 text-[#5A3A7F]">{tech}</span>
+                  <span className="text-t10 font-medium text-[#5A3A7F]">{tech} — budgetary rate card</span>
+                </div>
+                {rows.map((it) => (
+                  <div key={`${tech}-${it.code}`} className="grid min-w-[1100px] items-center border-t-[0.5px] border-line bg-white px-1.5 py-1.5 hover:bg-[#FBF9F7]" style={{ gridTemplateColumns: GRID }}>
+                    <div />
+                    <div className="px-1 font-mono text-t9 font-bold text-accent">{it.code}</div>
+                    <div className="text-t11 font-medium text-ink">{it.name}</div>
+                    <div className="text-t9 text-muted">{tech}</div>
+                    <div className="text-center">
+                      {it.sel ? (
+                        <span className="rounded border-[0.5px] border-[#B8E0C8] bg-success-soft px-1.5 py-0.5 text-t8 font-semibold text-success">Default</span>
+                      ) : (
+                        <span className="rounded border-[0.5px] border-line bg-canvas px-1.5 py-0.5 text-t8 font-semibold text-faint">Optional</span>
+                      )}
+                    </div>
+                    <div className="text-center text-t10 text-faint">sqft</div>
+                    <div className="text-right font-mono text-t10 text-muted">—</div>
+                    <div className="text-right font-mono text-t10 text-ink">₹{it.rate}</div>
+                    <div className="text-right text-t10 text-faint">—</div>
+                    <div className="text-right text-t10 text-faint">—</div>
+                    <div className="text-right text-t10 text-faint">—</div>
+                    <div className="text-right text-t10 text-faint">—</div>
+                    <div className="text-right text-t10 text-faint">—</div>
+                    <div className="-my-1.5 -mr-1.5 bg-accent-soft p-1.5 text-right font-mono text-t11 font-bold text-accent">₹{quotedRate(it.rate)}</div>
+                    <div className="px-1 text-center text-t9 leading-[1.4] text-faint">
+                      ₹/sqft
+                      <br />
+                      <span className="text-t9 font-medium text-muted">quoted</span>
+                    </div>
+                  </div>
+                ))}
+              </Fragment>
+            );
+          })}
+        </Fragment>
+      )}
 
       <div className="min-w-[1100px] border-t-[0.5px] border-line bg-canvas px-3 py-[7px] text-t9 text-faint">
         Click <strong>+</strong> on any line item to expand BOM breakdown. BOM sub-row totals (qty × rate) land in the{" "}

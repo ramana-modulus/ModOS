@@ -39,9 +39,10 @@ export function LibraryPage() {
     return <div className="px-3.5 py-8 text-center text-t11 text-faint">{error ?? "Loading item library…"}</div>;
   }
 
-  const { kpis, categories, items, materials, manpower, machinery, transport, history } = data;
+  const { kpis, categories, items, materials, manpower, machinery, transport, history, budgetary } = data;
   const showCatFilter = sub === "lineitems" || sub === "material";
-  const catList = ["All", ...categories.map((c) => c.id)];
+  // "BQ" (Budgetary Costing) is a Line-Items-only sub-category, appended after the BOQ categories.
+  const catList = ["All", ...categories.map((c) => c.id), ...(sub === "lineitems" ? ["BQ"] : [])];
 
   return (
     <div className="flex min-h-0 flex-1 flex-col">
@@ -83,7 +84,7 @@ export function LibraryPage() {
           </div>
         )}
 
-        {sub === "lineitems" && <LineItemsTab items={items} categories={categories} activeCat={cat} />}
+        {sub === "lineitems" && <LineItemsTab items={items} categories={categories} activeCat={cat} budgetary={budgetary} />}
         {sub === "material" && <MaterialTab materials={materials} activeCat={cat} history={history} />}
         {sub === "manpower" && <ManpowerTab manpower={manpower} />}
         {sub === "machinery" && <MachineryTab machinery={machinery} />}

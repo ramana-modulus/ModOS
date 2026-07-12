@@ -13,11 +13,13 @@ export function DealsKanban({
   stages,
   thresholds,
   onMutated,
+  onEditLead,
 }: {
   leads: LeadView[];
   stages: BdStage[];
   thresholds: Partial<Record<StageId, StageThreshold>>;
   onMutated: () => void;
+  onEditLead?: (lead: LeadView) => void;
 }) {
   const { openPanel, closePanel } = usePanel();
   const cols = stages.filter((s) => DEAL_STATUSES.has(s.id));
@@ -27,7 +29,19 @@ export function DealsKanban({
     closePanel();
   };
   const open = (l: LeadView) =>
-    openPanel({ tag: l.ref, title: `${l.client} — ${l.co}`, width: 400, body: <LeadPanel lead={l} stages={stages} onMove={(s) => move(l.id, s)} /> });
+    openPanel({
+      tag: `${l.ref} · ${l.type}`,
+      title: `${l.client} — ${l.co}`,
+      width: 468,
+      body: (
+        <LeadPanel
+          lead={l}
+          stages={stages}
+          onMove={(s) => move(l.id, s)}
+          onEdit={onEditLead ? () => { closePanel(); onEditLead(l); } : undefined}
+        />
+      ),
+    });
 
   return (
     <div className="bd-kanban">
