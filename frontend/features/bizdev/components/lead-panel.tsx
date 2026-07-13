@@ -6,6 +6,7 @@ import { IconFileText } from "@tabler/icons-react";
 import type { BdStage, LeadView } from "@/features/bizdev/types";
 import { TechTag, TypePill, HeatPill } from "./tags";
 import { BudgetaryCosting } from "./budgetary-costing";
+import { QuoteAdjustments } from "./quote-adjustments";
 
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
@@ -198,9 +199,12 @@ export function LeadPanel({
                       B2G tender — costing is available to <strong>Contracts</strong>, which submits the bid once submittals & Finance docs are ready.
                     </div>
                   ) : (
-                    <button type="button" className="tbb p w-full justify-center" disabled={busy} onClick={() => go("proposal")}>
-                      📄 Generate Quote → Proposal
-                    </button>
+                    <>
+                      <QuoteAdjustments leadId={lead.id} />
+                      <button type="button" className="tbb p w-full justify-center" disabled={busy} onClick={() => go("proposal")}>
+                        📄 Generate Quote → Edit → PDF
+                      </button>
+                    </>
                   )}
                   <button type="button" className="tbb w-full justify-center" onClick={viewCosting}>View Costing</button>
                 </>

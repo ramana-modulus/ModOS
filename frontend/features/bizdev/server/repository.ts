@@ -82,6 +82,16 @@ export interface CreateLeadInput {
   tr?: string;
 }
 
+/** Mark a lead's costing as received from Estimation (Estimation → Consolidate
+ * & Send to BD). Flips `costingSubmitted`, which drives `costingReceived` in the
+ * deal panel (enabling "Generate Quote"). */
+export function markCostingReceived(id: string): LeadView {
+  const lead = leads.find((l) => l.id === id);
+  if (!lead) throw new Error(`Lead ${id} not found`);
+  lead.costingSubmitted = true;
+  return toView(lead);
+}
+
 /** Edit an existing lead's editable fields in place (`openEditLeadModal` → save). */
 export function updateLead(id: string, patch: Partial<CreateLeadInput>): LeadView {
   const lead = leads.find((l) => l.id === id);

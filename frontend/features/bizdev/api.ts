@@ -31,4 +31,6 @@ export const bizdevApi = {
   createLead: (input: NewLeadInput) => apiPost<{ lead: LeadView }>("/bizdev/lead", input),
   updateLead: (id: string, input: NewLeadInput) =>
     apiPost<{ lead: LeadView }>("/bizdev/lead/update", { id, ...input }),
+  markCostingReceived: (id: string) =>
+    apiPost<{ lead: LeadView }>("/bizdev/costing-received", { id }),
 };
