@@ -5,9 +5,12 @@ import type { EstSubProjectView } from "@/features/estimation/api";
 
 const th: CSSProperties = { padding: "6px 10px", fontSize: "8px", color: "#9B9894", fontWeight: 500, textTransform: "uppercase" };
 
-function statusStyle(status: EstSubProjectView["status"]): { color: string; label: string } {
-  if (status === "approved") return { color: "#3B6D11", label: "✓ Submitted" };
-  if (status === "submitted") return { color: "#E8A020", label: "In Review" };
+type SubStatus = EstSubProjectView["status"];
+
+function statusStyle(status: SubStatus, consolidated: boolean): { color: string; label: string } {
+  if (consolidated) return { color: "#185FA5", label: "✓ Sent to BD" };
+  if (status === "approved") return { color: "#3B6D11", label: "✓ Approved" };
+  if (status === "submitted") return { color: "#E8A020", label: "Checker Approved" };
   return { color: "#9B9894", label: "In Progress" };
 }
 
@@ -17,6 +20,10 @@ export interface SubProjectOverviewProps {
   subProjects: EstSubProjectView[];
   overviewTotalIncl: number;
   onSelect: (id: string) => void;
+  /** Live per-sub-project workflow status (overrides the payload snapshot). */
+  statusById?: Record<string, SubStatus>;
+  /** Whether the costing has been consolidated & sent to BD. */
+  consolidated?: boolean;
 }
 
 /**
@@ -24,7 +31,7 @@ export interface SubProjectOverviewProps {
  * and total (incl. GST), plus a grand-total header. Faithful port of
  * `renderSubProjectOverview`. Clicking a row drills into its costing sheet.
  */
-export function SubProjectOverview({ subProjects, overviewTotalIncl, onSelect }: SubProjectOverviewProps) {
+export function SubProjectOverview({ subProjects, overviewTotalIncl, onSelect, statusById, consolidated = false }: SubProjectOverviewProps) {
   if (subProjects.length === 0) {
     return (
       <div style={{ padding: "20px", textAlign: "center", fontSize: "11px", color: "#9B9894" }}>
@@ -54,7 +61,7 @@ export function SubProjectOverview({ subProjects, overviewTotalIncl, onSelect }:
           </thead>
           <tbody>
             {subProjects.map((sp, i) => {
-              const st = statusStyle(sp.status);
+              const st = statusStyle(statusById?.[sp.id] ?? sp.status, consolidated);
               return (
                 <tr
                   key={sp.id}

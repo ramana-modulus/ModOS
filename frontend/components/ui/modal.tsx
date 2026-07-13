@@ -15,6 +15,8 @@ export interface ModalProps {
   width?: number;
   children: ReactNode;
   className?: string;
+  /** Dark header (ink background, white title) — matches the prototype's submit dialog. */
+  dark?: boolean;
 }
 
 /** Centered dialog (`.ra-popup`). Closes on Escape and backdrop click. */
@@ -28,6 +30,7 @@ export function Modal({
   width = 560,
   children,
   className,
+  dark = false,
 }: ModalProps) {
   useEffect(() => {
     if (!open) return;
@@ -60,17 +63,17 @@ export function Modal({
           className
         )}
       >
-        <header className="flex items-center gap-2.5 border-b-[0.5px] border-line px-4 py-3.5">
+        <header className={cn("flex items-center gap-2.5 px-4 py-3.5", dark ? "bg-ink" : "border-b-[0.5px] border-line")}>
           {icon}
           <div className="min-w-0 flex-1">
-            <div className="truncate text-t13 font-semibold text-ink">{title}</div>
+            <div className={cn("truncate text-t13 font-semibold", dark ? "text-white" : "text-ink")}>{title}</div>
             {subtitle && <div className="truncate text-t10 text-faint">{subtitle}</div>}
           </div>
           <button
             type="button"
             onClick={onClose}
             aria-label="Close dialog"
-            className="cursor-pointer text-faint hover:text-ink"
+            className={cn("cursor-pointer", dark ? "text-white/70 hover:text-white" : "text-faint hover:text-ink")}
           >
             <IconX size={18} />
           </button>

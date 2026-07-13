@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import type { EstSubProjectWf } from "@/features/estimation/types";
 
 function Pill({ text, color, bg }: { text: string; color: string; bg: string }) {
@@ -9,21 +8,24 @@ function Pill({ text, color, bg }: { text: string; color: string; bg: string }) 
 
 /**
  * Approval Workflow tab (`renderEstimationWorkflow`) — the Maker → Checker →
- * Approver → BD sign-off chain for a sub-project's costing. Initialised from the
- * sub-project's `wf` and mutated in client state (demo, matches the prototype's
- * in-memory `submitTrade` / `checkerApprove` / `approverApprove`).
+ * Approver → BD sign-off chain for a sub-project's costing. Controlled: the `wf`
+ * state and mutations are owned by the Estimation page so Submit-for-Review (in
+ * the Costing Sheet) and the Overview consolidation share the same source.
  */
-export function EstWorkflowTab({ wf: initial, today }: { wf: EstSubProjectWf; today: string }) {
-  const [wf, setWf] = useState<EstSubProjectWf>(() => structuredClone(initial));
-
-  const submitTrade = (id: string) =>
-    setWf((prev) => ({
-      ...prev,
-      status: "in_progress",
-      trades: prev.trades.map((t) => (t.id === id ? { ...t, status: "submitted", submittedOn: today } : t)),
-    }));
-  const checkerApprove = () => setWf((prev) => ({ ...prev, checkerStatus: "approved", status: "checker_approved" }));
-  const approverApprove = () => setWf((prev) => ({ ...prev, approverStatus: "approved", status: "approved" }));
+export function EstWorkflowTab({
+  wf,
+  onSubmitTrade,
+  onCheckerApprove,
+  onApproverApprove,
+}: {
+  wf: EstSubProjectWf;
+  onSubmitTrade: (tradeId: string) => void;
+  onCheckerApprove: () => void;
+  onApproverApprove: () => void;
+}) {
+  const submitTrade = onSubmitTrade;
+  const checkerApprove = onCheckerApprove;
+  const approverApprove = onApproverApprove;
 
   const allSubmitted = wf.trades.every((t) => t.status === "submitted");
   const anySubmitted = wf.trades.some((t) => t.status === "submitted");

@@ -58,6 +58,60 @@ function ItemCode({ code }: { code: string }) {
   return <span className={code === "SS-1001" ? "ict ss" : "ict"}>{code}</span>;
 }
 
+/**
+ * An inline-editable numeric `<td>` (contentEditable). Commits on blur / Enter,
+ * canonicalising the cell text so React and the DOM stay in sync. `raw` shows
+ * the plain number (Qty); otherwise it's formatted with `fmtR` (rates).
+ * `allowNull` lets a rate be cleared back to "—".
+ */
+function EditableCell({
+  value,
+  onCommit,
+  raw = false,
+  allowNull = false,
+  className,
+  style,
+}: {
+  value: number | null;
+  onCommit: (v: number | null) => void;
+  raw?: boolean;
+  allowNull?: boolean;
+  className?: string;
+  style?: CSSProperties;
+}) {
+  const fmt = (v: number | null) => (v == null ? "—" : raw ? String(v) : fmtR(v));
+  return (
+    <td
+      className={className}
+      style={{ cursor: "text", ...style }}
+      contentEditable
+      suppressContentEditableWarning
+      spellCheck={false}
+      title="Click to edit"
+      onKeyDown={(e) => {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          e.currentTarget.blur();
+        }
+      }}
+      onBlur={(e) => {
+        const cleaned = e.currentTarget.innerText.replace(/[^0-9.\-]/g, "");
+        let next: number | null;
+        if (cleaned === "" || cleaned === "-" || cleaned === ".") {
+          next = allowNull ? null : 0;
+        } else {
+          const n = parseFloat(cleaned);
+          next = Number.isFinite(n) ? n : value;
+        }
+        e.currentTarget.innerText = fmt(next);
+        if (next !== value) onCommit(next);
+      }}
+    >
+      {fmt(value)}
+    </td>
+  );
+}
+
 /** Searchable per-(sub)category picker that adds a library item to the sheet.
  * The dropdown is rendered in a portal (fixed-positioned over the input) so it
  * floats above the rows below instead of being clipped by the table's scroll
@@ -162,9 +216,8 @@ export interface CostingSheetProps {
   config: EstConfig;
   /** Project floor area (sqft) for the per-category rate/sqft. */
   area: number;
-  /** Read-only status banner shown above the table. */
-  statusBanner?: ReactNode;
-  /** Extra controls rendered on the header row's right (e.g. Submit for Review). */
+  /** Status / submit control rendered in a fixed-width slot on the header row's
+   * right, so it can change (button ↔ status chip) without shifting the toolbar. */
   headerActions?: ReactNode;
 }
 
@@ -176,7 +229,7 @@ export interface CostingSheetProps {
  * (sub)category carries a searchable "+ Add line item" picker sourced from the
  * Item Libraries.
  */
-export function CostingSheet({ items, categories, config, area, statusBanner, headerActions }: CostingSheetProps) {
+export function CostingSheet({ items, categories, config, area, headerActions }: CostingSheetProps) {
   const cols = columns(config);
   const [sheetItems, setSheetItems] = useState<EstItem[]>(items);
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
@@ -197,6 +250,9 @@ export function CostingSheet({ items, categories, config, area, statusBanner, he
       else next.add(code);
       return next;
     });
+
+  const updateItem = (code: string, patch: Partial<EstItem>) =>
+    setSheetItems((prev) => prev.map((it) => (it.code === code ? { ...it, ...patch } : it)));
 
   const addItem = (catId: string, code: string) => {
     const li = LIB_BY_CODE.get(code);
@@ -401,11 +457,11 @@ export function CostingSheet({ items, categories, config, area, statusBanner, he
               </div>
             </td>
             <td style={{ textAlign: "center", color: "#6B6A68" }}>{it.unit}</td>
-            <td className="num editable" style={{ color: "var(--ac)" }}>{it.qty}</td>
+            <EditableCell value={it.qty} raw onCommit={(v) => updateItem(it.code, { qty: v ?? 0 })} className="num editable" style={{ color: "var(--ac)" }} />
             <td className="num" style={{ color: "#9B9894", fontStyle: "italic", fontSize: "9px" }} />
-            <td className="num editable">{it.material != null ? fmtR(it.material) : "—"}</td>
-            <td className="num editable">{it.machinery != null ? fmtR(it.machinery) : "—"}</td>
-            <td className="num editable">{it.manpower != null ? fmtR(it.manpower) : "—"}</td>
+            <EditableCell value={it.material} allowNull onCommit={(v) => updateItem(it.code, { material: v })} className="num editable" />
+            <EditableCell value={it.machinery} allowNull onCommit={(v) => updateItem(it.code, { machinery: v })} className="num editable" />
+            <EditableCell value={it.manpower} allowNull onCommit={(v) => updateItem(it.code, { manpower: v })} className="num editable" />
             <td className="num" style={{ color: "#9B9894" }}>{fmtR(c.tr)}</td>
             <td className="num" style={{ color: "#9B9894" }}>{fmtR(c.wa)}</td>
             <td className="num" style={{ fontWeight: 600, color: DARK }}>{fmtR(c.prime)}</td>
@@ -464,16 +520,16 @@ export function CostingSheet({ items, categories, config, area, statusBanner, he
   return (
     <>
       <div style={{ marginBottom: "5px", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "8px" }}>
-        <span className="text-t10 text-faint">All categories shown · Add line items per sub-category · expand a row for its BOM</span>
+        <span className="text-t10 text-faint">All categories shown · Qty &amp; rates are editable · add line items per sub-category · expand a row for its BOM</span>
         <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
-          <span className="text-t10 text-faint">
+          <span className="text-t10 text-faint" style={{ whiteSpace: "nowrap" }}>
             Transport {pct(config.transportPct)}% · Wastage {pct(config.wastagePct)}% · OH {pct(config.overheadsPct)}% · Markup {pct(config.markupPct)}% · GST {config.gstPct}%
           </span>
-          <button type="button" className="tbb" style={{ fontSize: 10 }} onClick={() => setFocus((f) => !f)}>
+          <button type="button" className="tbb" style={{ fontSize: 10, flexShrink: 0 }} onClick={() => setFocus((f) => !f)}>
             ⛶ {focus ? "Exit Focus" : "Focus Mode"}
           </button>
-          {headerActions}
-          {statusBanner}
+          {/* Fixed-width slot: the button ↔ status chip swap keeps the same footprint. */}
+          <div style={{ width: 260, display: "flex", justifyContent: "flex-end", flexShrink: 0 }}>{headerActions}</div>
         </div>
       </div>
       <div
