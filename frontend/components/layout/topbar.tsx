@@ -4,17 +4,22 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { IconBell, IconCheckbox, IconMenu2 } from "@tabler/icons-react";
 import { resolveDepartment } from "@/lib/nav";
+import { inboxApi } from "@/features/inbox/api";
+import { useQuery } from "@/features/procurement/hooks/use-query";
 
 interface TopbarProps {
-  /** Unread notification count shown on the bell badge. */
+  /** Override the unread count; defaults to the live inbox count. */
   notificationCount?: number;
   /** Mobile: toggles the off-canvas sidebar. */
   onMenuClick?: () => void;
 }
 
-export function Topbar({ notificationCount = 7, onMenuClick }: TopbarProps) {
+export function Topbar({ notificationCount, onMenuClick }: TopbarProps) {
   const pathname = usePathname();
   const { label, breadcrumb } = resolveDepartment(pathname);
+  // Re-read on navigation so a fresh win (which adds notifications) is reflected.
+  const { data } = useQuery(() => inboxApi.getInbox(), [pathname]);
+  const count = notificationCount ?? data?.unreadCount ?? 0;
 
   return (
     <header className="flex h-header flex-shrink-0 items-center gap-2 border-b-[0.5px] border-line bg-surface px-3.5">
@@ -39,7 +44,7 @@ export function Topbar({ notificationCount = 7, onMenuClick }: TopbarProps) {
       >
         <IconBell size={15} aria-hidden />
         <span className="ml-0.5 rounded-[10px] bg-accent px-1.5 py-px text-t9 font-bold text-white">
-          {notificationCount}
+          {count}
         </span>
       </Link>
       <Link

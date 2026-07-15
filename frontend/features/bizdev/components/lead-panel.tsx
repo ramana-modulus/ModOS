@@ -3,6 +3,8 @@
 import { useState, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import { IconFileText } from "@tabler/icons-react";
+import { useProjectWon } from "@/components/layout/project-won-provider";
+import { bizdevApi } from "@/features/bizdev/api";
 import type { BdStage, LeadView } from "@/features/bizdev/types";
 import { TechTag, TypePill, HeatPill } from "./tags";
 import { BudgetaryCosting } from "./budgetary-costing";
@@ -44,6 +46,7 @@ export function LeadPanel({
   onEdit?: () => void;
 }) {
   const router = useRouter();
+  const { celebrate } = useProjectWon();
   const stage = stages.find((s) => s.id === lead.status);
   const isLead = lead.status === "enquiry";
   const [tab, setTab] = useState<"info" | "bq" | "docs">("info");
@@ -55,6 +58,16 @@ export function LeadPanel({
     setBusy(true);
     try {
       await onMove(s);
+      // Winning a deal creates a project + fires company-wide notifications;
+      // show the celebration banner with the real new project code.
+      if (s === "won") {
+        try {
+          const { project } = await bizdevApi.winProject(lead.id);
+          celebrate(project.name, project.code);
+        } catch {
+          celebrate(lead.co || lead.client);
+        }
+      }
     } finally {
       setBusy(false);
     }

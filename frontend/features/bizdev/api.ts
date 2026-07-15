@@ -33,4 +33,7 @@ export const bizdevApi = {
     apiPost<{ lead: LeadView }>("/bizdev/lead/update", { id, ...input }),
   markCostingReceived: (id: string) =>
     apiPost<{ lead: LeadView }>("/bizdev/costing-received", { id }),
+  /** Deal-won side effects: create the project + fire company-wide notifications. */
+  winProject: (id: string) =>
+    apiPost<{ project: { code: string; name: string } }>("/bizdev/won", { id }),
 };

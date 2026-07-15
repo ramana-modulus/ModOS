@@ -2,8 +2,13 @@ import "server-only";
 import { LEADS } from "@/features/bizdev/data/leads";
 import { BD_STAGES, DEMO_TODAY, STAGE_THRESHOLDS } from "@/features/bizdev/data/stages";
 import { getDaysInStage, getDaysSinceCreated, isCostingReceived } from "@/features/bizdev/domain";
+import { PROJECTS } from "@/features/procurement/data/projects";
+import { EST_SUBPROJECTS } from "@/features/estimation/data";
+import { MY_TASKS, NOTIFICATIONS } from "@/features/inbox/data";
 import type { BizDevPayload } from "@/features/bizdev/api";
 import type { Lead, LeadView, StageId } from "@/features/bizdev/types";
+import type { Project } from "@/types/procurement";
+import type { AppNotification, MyTask } from "@/features/inbox/types";
 
 const TERMINAL = new Set(["lost", "not_participated"]);
 const VALID_STAGES: StageId[] = ["enquiry", "costing", "proposal", "negotiation", "won", "lost", "not_participated"];
@@ -80,6 +85,87 @@ export interface CreateLeadInput {
   area?: number;
   dl?: string | null;
   tr?: string;
+}
+
+const WON_DEPTS = ["BD", "Estimation", "Engineering", "Procurement", "Ops", "Finance", "Admin"];
+const STEEL_TECH = new Set(["PEB", "CISP", "LGSF", "Portacabin", "Prefab Shelter"]);
+const wonProjects = new Map<string, { code: string; name: string }>();
+
+/**
+ * Deal-won side effects (prototype `markWon`): create a Project record, notify
+ * every department, and queue the PM's WBS task. Idempotent per lead — the stage
+ * move itself is done by moveStage; this creates the downstream records. Returns
+ * the new project's code + name for the company-wide "Project Won" banner.
+ */
+export function createWonProject(leadId: string): { code: string; name: string } {
+  const existing = wonProjects.get(leadId);
+  if (existing) return existing;
+
+  const lead = leads.find((l) => l.id === leadId);
+  if (!lead) throw new Error(`Lead ${leadId} not found`);
+
+  const tech = lead.tech[0] || "PEB";
+  const name = lead.co || lead.client;
+  const code = `MH-${String(Date.now()).slice(-5)}`;
+  const value = lead.ev ? `₹${(lead.ev / 100000).toFixed(1)}L` : "—";
+
+  const subProjects = (EST_SUBPROJECTS[leadId] ?? []).map((sp, i) => ({
+    id: `SP${i + 1}`,
+    name: sp.name,
+    units: sp.units,
+    spec: sp.spec,
+  }));
+
+  const project: Project = {
+    id: `P${PROJECTS.length + 1}`,
+    code,
+    name,
+    client: lead.client,
+    type: tech,
+    stage: "Project Created",
+    value,
+    steelApplicable: STEEL_TECH.has(tech),
+    startDate: null,
+    duration: 90,
+    awarded: true,
+    ...(subProjects.length ? { subProjects } : {}),
+  };
+  PROJECTS.push(project);
+
+  // Company-wide notifications — one per department.
+  const notifs: AppNotification[] = WON_DEPTS.map((dept, i) => ({
+    id: `WON_${leadId}_${i}`,
+    dept,
+    project: name,
+    ref: code,
+    type: "info",
+    priority: dept === "Admin" || dept === "BD" ? "high" : "med",
+    msg: `🎉 New project won — ${name} (${tech}) · ${value}. Project created and ready for WBS.`,
+    ...(dept === "Admin" || dept === "Ops" || dept === "Engineering" ? { action: "Open Project" } : {}),
+    actionTarget: "projects",
+    date: `${DEMO_TODAY} · Now`,
+    unread: true,
+    from: "BD Team",
+    to: [dept],
+  }));
+  for (const n of notifs) NOTIFICATIONS.unshift(n);
+
+  // PM's WBS task.
+  const task: MyTask = {
+    id: `T_WBS_${leadId}`,
+    dept: "Projects",
+    project: name,
+    msg: `Build WBS for ${name} — new project created post deal win`,
+    priority: "high",
+    due: "ASAP",
+    done: false,
+    target: "projects",
+  };
+  MY_TASKS.unshift(task);
+
+  const result = { code, name };
+  wonProjects.set(leadId, result);
+  return result;
 }
 
 /** Mark a lead's costing as received from Estimation (Estimation → Consolidate

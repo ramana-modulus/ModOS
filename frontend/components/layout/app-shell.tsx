@@ -3,6 +3,8 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { usePathname } from "next/navigation";
 import { PanelProvider } from "./panel-provider";
+import { ProjectWonProvider } from "./project-won-provider";
+import { ProjectWonBanner } from "./project-won-banner";
 import { Sidebar } from "./sidebar";
 import { Topbar } from "./topbar";
 import { SlideOverPanel } from "./slide-over-panel";
@@ -21,7 +23,9 @@ export function AppShell({ children }: { children: ReactNode }) {
   }, [pathname]);
 
   return (
-    <PanelProvider>
+    <ProjectWonProvider>
+      <ProjectWonBanner />
+      <PanelProvider>
       <div className="flex h-screen overflow-hidden">
         {/* Desktop sidebar */}
         <div className="hidden md:flex">
@@ -49,6 +53,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           <SlideOverPanel />
         </div>
       </div>
-    </PanelProvider>
+      </PanelProvider>
+    </ProjectWonProvider>
   );
 }
